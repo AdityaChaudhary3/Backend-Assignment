@@ -481,6 +481,20 @@ const getWatchHistory = asyncHandler(async(req, res) => {
 })
 
 
+const getUserDetails = asyncHandler(async(req, res) => {
+    const {userId} = req.params
+
+    if (!userId) {
+        throw new ApiError(400, "userId is missing")
+    }
+
+    const user = await User.findById(userId).select("-password -refreshToken -watchHistory")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User fetched successfully"))
+})
+
 export {
     registerUser,
     loginUser,
@@ -492,5 +506,6 @@ export {
     updateUserAvatar,
     updateUserCoverImage,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    getUserDetails
 }
