@@ -59,6 +59,7 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
+    // myTodo: add check for authorization. in delete and other model also.
 
     const {commentId} = req.params
     const {content} = req.body
