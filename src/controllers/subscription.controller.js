@@ -19,6 +19,11 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
     if(list){
         console.log("list", list)
+
+        if(list.subscriber.toString() !== user._id.toString()){
+            throw new ApiError(403, "You are not authorized to perform this action")
+        }
+
         const subscription = await Subscription.findByIdAndDelete(list._id)
 
         return res

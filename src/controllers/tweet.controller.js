@@ -51,10 +51,20 @@ const updateTweet = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
 
     if(!tweetId){
-        throw new ApiError(400, "tweet not found")
+        throw new ApiError(400, "Please provide tweet id")
     }
 
-    const tweet = await Tweet.findByIdAndUpdate(
+    const tweet = await Tweet.findById(tweetId)
+
+    if(!tweet){
+        throw new ApiError(404, "tweet not found")
+    }
+
+    if(tweet.owner.toString() !== req.user?._id.toString()){
+        throw new ApiError(403, "You are not authorized to update this tweet")
+    }
+
+    const tweetUpdated = await Tweet.findByIdAndUpdate(
         tweetId,
         {
             $set: {
@@ -66,7 +76,7 @@ const updateTweet = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, tweet, "Tweet update successfully."))
+    .json(new ApiResponse(200, tweetUpdated, "Tweet update successfully."))
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
@@ -75,12 +85,21 @@ const deleteTweet = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
 
     if(!tweetId){
-        throw new ApiError(400, "tweet not found")
+        throw new ApiError(400, "Please provide tweet id")
     }
 
-    const tweet = await Tweet.findByIdAndDelete(tweetId)
+    const tweet = await Tweet.findById(tweetId)
 
-    console.log("deletion response", tweet)
+    if(!tweet){
+        throw new ApiError(404, "tweet not found")
+    }
+
+    if(tweet.owner.toString() !== req.user?._id.toString()){
+        throw new ApiError(403, "You are not authorized to delete this tweet")
+    }
+
+    await Tweet.findByIdAndDelete(tweetId)
+
 
     return res
     .status(200)

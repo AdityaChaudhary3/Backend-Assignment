@@ -65,10 +65,20 @@ const updateComment = asyncHandler(async (req, res) => {
     const {content} = req.body
 
     if(!commentId){
-        throw new ApiError(400, "comment not found")
+        throw new ApiError(400, "Please provide comment id.")
     }
 
-    const comment = await Comment.findByIdAndUpdate(
+    const comment = await Comment.findById(commentId)
+
+    if(!comment){
+        throw new ApiError(404, "comment not found.")
+    }
+
+    if(comment.owner.toString() !== req.user._id.toString()){
+        throw new ApiError(403, "Unauthorized access, you can't update this comment.")
+    }
+
+    const commentUpdated = await Comment.findByIdAndUpdate(
         commentId,
         {
             $set: {
@@ -80,7 +90,7 @@ const updateComment = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, comment, "comment updated."))
+    .json(new ApiResponse(200, commentUpdated, "comment updated."))
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
@@ -89,7 +99,17 @@ const deleteComment = asyncHandler(async (req, res) => {
     const {commentId} = req.params
 
     if(!commentId){
-        throw new ApiError(400, "comment not found")
+        throw new ApiError(404, "Please provide comment id.")
+    }
+
+    if(comment.owner.toString() !== req.user._id.toString()){
+        throw new ApiError(403, "Unauthorized access, you can't delete this comment.")
+    }
+
+    const comment = await Comment.findById(commentId)
+
+    if(!comment){
+        throw new ApiError(400, "comment not found.")
     }
 
     await Comment.findByIdAndDelete(commentId)

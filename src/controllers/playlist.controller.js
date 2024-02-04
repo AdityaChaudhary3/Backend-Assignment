@@ -70,7 +70,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Playlist is not found.")
     }
 
-    if(playlist.owner.toString() !== req?.user._id.toString()){
+    if(playlist.owner.toString() !== req.user?._id.toString()){
         throw new ApiError(403, "Unautharized accces, can't add video in playliist.")
     }
 
@@ -105,7 +105,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Playlist is not found.")
     }
 
-    if(playlist.owner.toString() !== req?.user._id.toString()){
+    if(playlist.owner.toString() !== req.user?._id.toString()){
         throw new ApiError(403, "Unautharized accces, can't remove video from playliist.")
     }
 
@@ -144,7 +144,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Playlist is not found.")
     }
 
-    if(playlist.owner.toString() !== req?.user._id.toString()){
+    if(playlist.owner.toString() !== req.user?._id.toString()){
         throw new ApiError(403, "Unautharized accces, you can't delete playliist.")
     }
     
@@ -168,7 +168,17 @@ const updatePlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Please provide the field to update.")
     }
 
-    const playlist = await Playlist.findByIdAndUpdate(
+    const playlist = await Playlist.findById(playlistId)
+
+    if(!playlist){
+        throw new ApiError(400, "Playlist is not found.")
+    }
+
+    if(playlist.owner.toString() !== req.user?._id.toString()){
+        throw new ApiError(403, "Unautharized accces, you can't update playliist.")
+    }
+
+    const playlistUpdated = await Playlist.findByIdAndUpdate(
         playlistId,
         {
             $set:{
@@ -180,7 +190,7 @@ const updatePlaylist = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, playlist, "Playlist get updated."))
+    .json(new ApiResponse(200, playlistUpdated, "Playlist get updated."))
 
 })
 

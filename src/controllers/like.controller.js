@@ -16,6 +16,11 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     const list = await Like.findOne({video: videoId, likedBy: user._id})
 
     if(list){
+
+        if(list.likedBy.toString() !== user._id.toString()){
+            throw new ApiError(403, "You are not authorized to perform this action")
+        }
+
         const like = await Like.findByIdAndDelete(list._id)
 
         return res
@@ -47,6 +52,11 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     const list = await Like.findOne({comment: commentId, likedBy: user._id})
 
     if(list){
+
+        if(list.likedBy.toString() !== user._id.toString()){
+            throw new ApiError(403, "You are not authorized to perform this action")
+        }
+
         const like = await Like.findByIdAndDelete(list._id)
 
         return res
@@ -78,6 +88,11 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const list = await Like.findOne({tweet: tweetId, likedBy: user._id})
 
     if(list){
+
+        if(list.likedBy.toString() !== user._id.toString()){
+            throw new ApiError(403, "You are not authorized to perform this action")
+        }
+
         const like = await Like.findByIdAndDelete(list._id)
 
         return res
