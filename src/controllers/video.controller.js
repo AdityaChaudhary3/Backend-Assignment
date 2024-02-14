@@ -56,7 +56,11 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new ApiError(400, "video not found.")
     }
 
-    const video = await Video.findById(videoId)
+    const video = await Video.findByIdAndUpdated(videoId, {
+        $inc: {
+            views: 1
+        }
+    })
 
     return res
     .status(200)
@@ -93,6 +97,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: delete video
+    //myTodo: delete video from cloudinary and delete comments and likes associated with the video
 
     if(!videoId){
         throw new ApiError(400, "video not found.")
